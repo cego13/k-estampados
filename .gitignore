@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Backend local folder
+backend/
+
 # Raw large 3D sources
 *.obj
 *.mtl
