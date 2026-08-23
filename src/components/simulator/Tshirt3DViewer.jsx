@@ -11,7 +11,8 @@ export default function Tshirt3DViewer({
   designs = [],
   activeDesignId,
   updateDesign,
-  fabricType = 'tela-algodon'
+  fabricType = 'tela-algodon',
+  isStandalone = false
 }) {
   const toast = useToast();
   const canvasMountRef = useRef(null);
@@ -447,7 +448,7 @@ export default function Tshirt3DViewer({
   };
 
   return (
-    <div className="relative w-full max-w-[500px] aspect-[4/5] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-3xl border border-slate-800 shadow-2xl flex flex-col justify-between select-none overflow-hidden">
+    <div className={`relative w-full ${isStandalone ? 'max-w-4xl h-[75vh] sm:h-[80vh]' : 'max-w-[500px] aspect-[4/5]'} bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-3xl border border-slate-800 shadow-2xl flex flex-col justify-between select-none overflow-hidden mx-auto`}>
       
       {/* Barra Superior con Selector de Ángulos & Botones */}
       <div className="p-2.5 sm:p-3.5 z-10 space-y-2 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
@@ -504,14 +505,16 @@ export default function Tshirt3DViewer({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleOpenNewWindow}
-              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
-              title="Abrir en una ventana grande independiente"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
-              <span>Ver Grande</span>
-            </button>
+            {!isStandalone && (
+              <button
+                onClick={handleOpenNewWindow}
+                className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                title="Abrir en una ventana grande independiente"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+                <span>Ver Grande</span>
+              </button>
+            )}
 
             <button
               onClick={handleDownload3DModel}
