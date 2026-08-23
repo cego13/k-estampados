@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shirt, MessageCircle, Instagram, Facebook, Phone, MapPin, Sparkles, ShieldCheck, Heart } from 'lucide-react';
 import logoImg from '../../assets/logo-ck.png';
-import { WHATSAPP_PHONE } from '../../data/productsData';
+import { WHATSAPP_PHONE, INSTAGRAM_URL } from '../../data/productsData';
 
 export default function Footer() {
   return (
@@ -46,11 +46,12 @@ export default function Footer() {
                 <MessageCircle className="w-4 h-4" />
               </a>
               <a
-                href="https://instagram.com"
+                href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-700"
-                aria-label="Instagram"
+                className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-gradient-to-tr hover:from-amber-500 hover:via-rose-500 hover:to-purple-600 text-slate-300 hover:text-white flex items-center justify-center transition-all border border-slate-700 shadow-sm"
+                aria-label="Instagram Oficial de CK Estampados"
+                title="@ck.estampados en Instagram"
               >
                 <Instagram className="w-4 h-4" />
               </a>

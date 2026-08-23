@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, MessageCircle, Phone, MapPin, Clock, ShieldCheck } from 'lucide-react';
-import { FAQS, WHATSAPP_PHONE } from '../data/productsData';
+import { ChevronDown, MessageCircle, Phone, MapPin, Clock, ShieldCheck, Instagram } from 'lucide-react';
+import { FAQS, WHATSAPP_PHONE, INSTAGRAM_URL } from '../data/productsData';
 
 export default function FaqContactPage() {
   const [openIndex, setOpenIndex] = useState(0);
@@ -193,6 +193,15 @@ Solicito confirmacion de precios, disponibilidad y tiempos de entrega.`;
                 <Phone className="w-4 h-4 text-blue-600 shrink-0" />
                 <span className="font-mono font-bold">+57 318 624 1724</span>
               </div>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-slate-700 hover:text-rose-600 transition-colors group"
+              >
+                <Instagram className="w-4 h-4 text-rose-500 shrink-0 group-hover:scale-110 transition-transform" />
+                <span>Instagram: <strong className="font-bold underline decoration-rose-300 underline-offset-2">@ck.estampados</strong></span>
+              </a>
               <div className="flex items-center gap-3 text-slate-700">
                 <Clock className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>Lunes a Sábado: 8:00 AM – 7:00 PM</span>

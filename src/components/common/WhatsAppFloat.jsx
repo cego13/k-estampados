@@ -1,10 +1,17 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { WHATSAPP_PHONE } from '../../data/productsData';
 
 export default function WhatsAppFloat() {
+  const location = useLocation();
+  const isSimulator = location.pathname === '/simulador';
+
   return (
-    <aside aria-label="Contacto directo" className="fixed bottom-6 right-6 z-40">
+    <aside
+      aria-label="Contacto directo"
+      className={`fixed bottom-6 right-6 z-40 ${isSimulator ? 'hidden lg:block' : ''}`}
+    >
       <a
         href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent('Hola CK Estampados. Me gustaria hacer una consulta sobre sus camisetas personalizadas.')}`}
         target="_blank"

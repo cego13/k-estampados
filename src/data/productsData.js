@@ -6,6 +6,7 @@ import oversizeNegro from '../assets/telas/oversize_negro.png';
 import oversizeBlanco from '../assets/telas/oversize_blacno.png';
 
 export const WHATSAPP_PHONE = "573186241724";
+export const INSTAGRAM_URL = "https://www.instagram.com/ck.estampados?utm_source=qr&igsi=ejl2bHdpcW15eGI=";
 
 export const FABRIC_TYPES = [
   {

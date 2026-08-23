@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
 import { Rotate3d, Box, Camera, ArrowLeft } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import logoImg from '../assets/logo-ck.png';
@@ -16,6 +17,7 @@ export default function Tshirt3DStandalonePage() {
   const controlsRef = useRef(null);
   const tshirtMeshRef = useRef(null);
   const decalsGroupRef = useRef(new THREE.Group());
+  const raycasterRef = useRef(new THREE.Raycaster());
   const textureLoaderRef = useRef(new THREE.TextureLoader());
   const textureCacheRef = useRef(new Map());
 
@@ -70,15 +72,16 @@ export default function Tshirt3DStandalonePage() {
   }, []);
 
   const buildDecals = () => {
+    const mesh = tshirtMeshRef.current;
     const group = decalsGroupRef.current;
-    if (!group) return;
+    if (!mesh || !group) return;
 
+    // Limpiar decals anteriores sin destruir texturas en caché
     while (group.children.length > 0) {
       const child = group.children[0];
       group.remove(child);
       if (child.geometry) child.geometry.dispose();
       if (child.material) {
-        if (child.material.map) child.material.map.dispose();
         child.material.dispose();
       }
     }
@@ -88,99 +91,83 @@ export default function Tshirt3DStandalonePage() {
     state.designs.forEach((design) => {
       const view = design.view || 'frente';
       const scale = (design.scale || 100) / 100;
-      const rotRad = -((design.rotation || 0) * Math.PI) / 180;
+      const rot = ((design.rotation || 0) * Math.PI) / 180;
 
-      const baseWidth = 0.58 * scale;
-      const baseHeight = 0.58 * scale;
-
-      const segments = 16;
-      const planeGeo = new THREE.PlaneGeometry(baseWidth, baseHeight, segments, segments);
-      const posAttr = planeGeo.attributes.position;
-
-      for (let i = 0; i < posAttr.count; i++) {
-        const vx = posAttr.getX(i);
-        const curveZ = -Math.pow(vx, 2) * 0.12;
-        posAttr.setZ(i, curveZ);
-      }
-      planeGeo.computeVertexNormals();
-
-      let posX = 0, posY = 0, posZ = 0;
-      let rotX = 0, rotY = 0, rotZ = 0;
+      let rayOrigin, rayDir, orientation, decalSize;
 
       if (view === 'frente') {
-        const xOffset = (design.x || 0) * 0.0055;
-        const yOffset = -(design.y || 0) * 0.0055;
-        posX = xOffset;
-        posY = 0.22 + yOffset;
-        posZ = 0.315;
-        rotX = 0;
-        rotY = 0;
-        rotZ = rotRad;
+        const xOffset = (design.x || 0) * 0.006;
+        const yOffset = -(design.y || 0) * 0.006;
+        rayOrigin = new THREE.Vector3(xOffset, 0.2 + yOffset, 2.0);
+        rayDir = new THREE.Vector3(0, 0, -1);
+        orientation = new THREE.Euler(0, 0, -rot);
+        decalSize = new THREE.Vector3(0.55 * scale, 0.55 * scale, 0.4);
       } else if (view === 'espalda') {
-        const xOffset = -(design.x || 0) * 0.0055;
-        const yOffset = -(design.y || 0) * 0.0055;
-        posX = xOffset;
-        posY = 0.22 + yOffset;
-        posZ = -0.315;
-        rotX = 0;
-        rotY = Math.PI;
-        rotZ = -rotRad;
+        const xOffset = (design.x || 0) * 0.006;
+        const yOffset = -(design.y || 0) * 0.006;
+        rayOrigin = new THREE.Vector3(-xOffset, 0.2 + yOffset, -2.0);
+        rayDir = new THREE.Vector3(0, 0, 1);
+        orientation = new THREE.Euler(0, Math.PI, rot);
+        decalSize = new THREE.Vector3(0.55 * scale, 0.55 * scale, 0.4);
       } else if (view === 'manga-izquierda') {
-        const zOffset = -(design.x || 0) * 0.0035;
-        const yOffset = -(design.y || 0) * 0.0035;
-        posX = 0.72;
-        posY = 0.44 + yOffset;
-        posZ = zOffset;
-        rotX = 0;
-        rotY = Math.PI / 2;
-        rotZ = rotRad;
+        const zOffset = (design.x || 0) * 0.003;
+        const yOffset = 0.50 - (design.y || 0) * 0.004;
+        rayOrigin = new THREE.Vector3(2.0, yOffset, zOffset);
+        rayDir = new THREE.Vector3(-1, 0, 0);
+        orientation = new THREE.Euler(0, Math.PI / 2, -rot);
+        decalSize = new THREE.Vector3(0.42 * scale, 0.42 * scale, 0.35);
       } else if (view === 'manga-derecha') {
-        const zOffset = (design.x || 0) * 0.0035;
-        const yOffset = -(design.y || 0) * 0.0035;
-        posX = -0.72;
-        posY = 0.44 + yOffset;
-        posZ = zOffset;
-        rotX = 0;
-        rotY = -Math.PI / 2;
-        rotZ = -rotRad;
+        const zOffset = (design.x || 0) * 0.003;
+        const yOffset = 0.50 - (design.y || 0) * 0.004;
+        rayOrigin = new THREE.Vector3(-2.0, yOffset, zOffset);
+        rayDir = new THREE.Vector3(1, 0, 0);
+        orientation = new THREE.Euler(0, -Math.PI / 2, rot);
+        decalSize = new THREE.Vector3(0.42 * scale, 0.42 * scale, 0.35);
       }
 
-      const applyTextureToMesh = (texture) => {
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.needsUpdate = true;
+      raycasterRef.current.set(rayOrigin, rayDir);
+      const hits = raycasterRef.current.intersectObject(mesh, false);
 
-        const decalMat = new THREE.MeshStandardMaterial({
-          map: texture,
-          transparent: true,
-          alphaTest: 0.02,
-          roughness: 0.35,
-          metalness: 0.02,
-          side: THREE.DoubleSide,
-          depthWrite: true,
-          depthTest: true
-        });
-
-        const decalMesh = new THREE.Mesh(planeGeo, decalMat);
-        decalMesh.position.set(posX, posY, posZ);
-        decalMesh.rotation.set(rotX, rotY, rotZ);
-        decalMesh.renderOrder = 10;
-        decalMesh.castShadow = true;
-
-        group.add(decalMesh);
-      };
-
-      if (textureCacheRef.current.has(design.src)) {
-        applyTextureToMesh(textureCacheRef.current.get(design.src));
+      let position;
+      if (hits.length > 0) {
+        position = hits[0].point.clone();
       } else {
-        textureLoaderRef.current.load(
-          design.src,
-          (loadedTex) => {
-            textureCacheRef.current.set(design.src, loadedTex);
-            applyTextureToMesh(loadedTex);
-          },
-          undefined,
-          (err) => console.warn('Error cargando textura 3D:', err)
-        );
+        if (view === 'frente') position = new THREE.Vector3((design.x || 0) * 0.006, 0.2 - (design.y || 0) * 0.006, 0.36);
+        else if (view === 'espalda') position = new THREE.Vector3(-(design.x || 0) * 0.006, 0.2 - (design.y || 0) * 0.006, -0.36);
+        else if (view === 'manga-izquierda') position = new THREE.Vector3(0.92, 0.50 - (design.y || 0) * 0.004, (design.x || 0) * 0.003);
+        else position = new THREE.Vector3(-0.92, 0.50 - (design.y || 0) * 0.004, (design.x || 0) * 0.003);
+      }
+
+      let texture = textureCacheRef.current.get(design.src);
+      if (!texture) {
+        texture = textureLoaderRef.current.load(design.src);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        textureCacheRef.current.set(design.src, texture);
+      }
+
+      const decalMaterial = new THREE.MeshStandardMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        roughness: 0.72,
+        metalness: 0.04
+      });
+
+      try {
+        const decalGeometry = new DecalGeometry(mesh, position, orientation, decalSize);
+        const decalMesh = new THREE.Mesh(decalGeometry, decalMaterial);
+        decalMesh.renderOrder = 2;
+        group.add(decalMesh);
+      } catch (err) {
+        console.warn('Fallback a proyección planar:', err);
+        const planeGeo = new THREE.PlaneGeometry(decalSize.x, decalSize.y);
+        const planeMesh = new THREE.Mesh(planeGeo, decalMaterial);
+        planeMesh.position.copy(position);
+        planeMesh.rotation.copy(orientation);
+        group.add(planeMesh);
       }
     });
   };
@@ -430,9 +417,10 @@ export default function Tshirt3DStandalonePage() {
     const meshClone = tshirtMeshRef.current.clone();
     exportGroup.add(meshClone);
 
-    decalsGroupRef.current.children.forEach((child) => {
-      exportGroup.add(child.clone());
-    });
+    if (decalsGroupRef.current && decalsGroupRef.current.children.length > 0) {
+      const decalsClone = decalsGroupRef.current.clone();
+      exportGroup.add(decalsClone);
+    }
 
     exporter.parse(
       exportGroup,
