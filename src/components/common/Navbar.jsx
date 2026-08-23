@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Shirt, Sparkles, Menu, X, MessageCircle } from 'lucide-react';
+import { Sparkles, Menu, X, MessageCircle } from 'lucide-react';
 import logoImg from '../../assets/logo-ck.png';
 import { WHATSAPP_PHONE } from '../../data/productsData';
 
@@ -19,13 +19,22 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  // Cerrar automáticamente el menú móvil en cada navegación
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-200 shadow-sm transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
           {/* LOGO OFICIAL */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link
+            to="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 group"
+          >
             <div className="h-11 w-11 rounded-xl bg-white p-1 flex items-center justify-center border border-neutral-200 shadow-sm group-hover:scale-105 transition-transform">
               <img
                 src={logoImg}
@@ -120,6 +129,7 @@ export default function Navbar() {
               href={`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent('Hola CK Estampados. Quiero hacer un pedido personalizado.')}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
               className="w-full py-3.5 rounded-xl bg-blue-600 text-white font-black text-xs uppercase flex items-center justify-center gap-2 shadow-md"
             >
               <MessageCircle className="w-4 h-4" />

@@ -55,7 +55,6 @@ export default function Tshirt3DViewer({
       group.remove(child);
       if (child.geometry) child.geometry.dispose();
       if (child.material) {
-        if (child.material.map) child.material.map.dispose();
         child.material.dispose();
       }
     }
@@ -451,83 +450,88 @@ export default function Tshirt3DViewer({
     <div className="relative w-full max-w-[500px] aspect-[4/5] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-3xl border border-slate-800 shadow-2xl flex flex-col justify-between select-none overflow-hidden">
       
       {/* Barra Superior con Selector de Ángulos & Botones */}
-      <div className="p-3 sm:p-4 z-10 flex items-center justify-between gap-2 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-sm">
+      <div className="p-2.5 sm:p-3.5 z-10 space-y-2 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
         
-        {/* Preset de Ángulos */}
-        <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+        {/* Fila 1: Selector de Ángulos 3D (Distribución completa) */}
+        <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 w-full justify-between">
           <button
             onClick={() => setCameraPreset('frente')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-              currentAngle === 'frente' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+              currentAngle === 'frente' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             Frente
           </button>
           <button
             onClick={() => setCameraPreset('espalda')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-              currentAngle === 'espalda' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+              currentAngle === 'espalda' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             Espalda
           </button>
           <button
             onClick={() => setCameraPreset('manga-izq')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-              currentAngle === 'manga-izq' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+              currentAngle === 'manga-izq' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             Manga Izq
           </button>
           <button
             onClick={() => setCameraPreset('manga-der')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-              currentAngle === 'manga-der' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+              currentAngle === 'manga-der' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             Manga Der
           </button>
           <button
             onClick={() => setCameraPreset('360')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-              currentAngle === '360' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+              currentAngle === '360' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             360°
           </button>
         </div>
 
-        {/* BOTONES: ABRIR EN VENTANA NUEVA & DESCARGAR 3D */}
-        <div className="flex items-center gap-1.5">
-          
-          <button
-            onClick={handleOpenNewWindow}
-            className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-200 hover:text-white border border-slate-800 text-[11px] font-bold transition-all flex items-center gap-1 shadow-sm"
-            title="Abrir en una ventana grande independiente"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
-            <span className="hidden sm:inline">Ver Grande</span>
-          </button>
+        {/* Fila 2: Acciones 3D (Ver Grande & Descargar 3D) */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-400">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+            <span className="capitalize">{currentAngle === '360' ? 'Giro Automático' : `Vista: ${currentAngle}`}</span>
+          </div>
 
-          <button
-            onClick={handleDownload3DModel}
-            disabled={exporting3D || loading}
-            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-white font-extrabold text-[11px] uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shadow-blue-500/20"
-            title="Descargar archivo 3D (.glb) compatible con Visor 3D de Windows, Blender o Visores AR"
-          >
-            {exporting3D ? (
-              <>
-                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span className="hidden sm:inline">Generando...</span>
-              </>
-            ) : (
-              <>
-                <Box className="w-3.5 h-3.5" />
-                <span>Descargar 3D</span>
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleOpenNewWindow}
+              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+              title="Abrir en una ventana grande independiente"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+              <span>Ver Grande</span>
+            </button>
 
+            <button
+              onClick={handleDownload3DModel}
+              disabled={exporting3D || loading}
+              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shadow-blue-500/20"
+              title="Descargar archivo 3D (.glb)"
+            >
+              {exporting3D ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Generando...</span>
+                </>
+              ) : (
+                <>
+                  <Box className="w-3.5 h-3.5" />
+                  <span>Descargar 3D</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
       </div>

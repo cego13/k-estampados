@@ -1,0 +1,25 @@
+{
+  "name": "CK Estampados - Personaliza tu estilo",
+  "short_name": "CK Estampados",
+  "description": "Estampados textiles DTF HD de máxima durabilidad y confección colombiana. Personaliza tu camiseta en tiempo real.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#2563eb",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/logo-ck.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-ck.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

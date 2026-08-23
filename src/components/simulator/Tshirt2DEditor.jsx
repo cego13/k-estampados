@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Move, ZoomIn, RotateCw, Trash2, Check, RotateCcw, Sparkles, Layers } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { Move } from 'lucide-react';
 
 export default function Tshirt2DEditor({
   currentView,
@@ -20,11 +20,16 @@ export default function Tshirt2DEditor({
 
   const handlePointerDown = (e, design) => {
     e.stopPropagation();
+    if (e.cancelable) e.preventDefault();
     setActiveDesignId(design.id);
     isDraggingRef.current = true;
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
     dragStartRef.current = {
-      mouseX: e.clientX || (e.touches && e.touches[0].clientX),
-      mouseY: e.clientY || (e.touches && e.touches[0].clientY),
+      mouseX: clientX,
+      mouseY: clientY,
       initX: design.x || 0,
       initY: design.y || 0,
       designId: design.id
@@ -33,9 +38,10 @@ export default function Tshirt2DEditor({
 
   const handlePointerMove = (e) => {
     if (!isDraggingRef.current || !dragStartRef.current.designId) return;
+    if (e.cancelable) e.preventDefault();
 
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
     const deltaX = clientX - dragStartRef.current.mouseX;
     const deltaY = clientY - dragStartRef.current.mouseY;
@@ -71,19 +77,19 @@ export default function Tshirt2DEditor({
       ref={containerRef}
       onPointerMove={handlePointerMove}
       onTouchMove={handlePointerMove}
-      className="relative w-full max-w-[500px] aspect-[4/5] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-3xl border border-slate-800 shadow-2xl flex items-center justify-center select-none overflow-hidden"
+      className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[480px] aspect-[4/5] mx-auto bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-2xl sm:rounded-3xl border border-slate-800 shadow-2xl flex items-center justify-center select-none overflow-hidden touch-none"
     >
       {/* Fondo de Cuadrícula Sutil para Guía Visual */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:1.25rem_1.25rem] sm:bg-[size:1.5rem_1.5rem] opacity-20 pointer-events-none" />
 
       {/* SILUETA VECTORIAL DE CAMISETA CON PROPORCIONES REALES */}
-      <div className="relative w-[90%] h-[90%] flex items-center justify-center">
+      <div className="relative w-[92%] h-[92%] flex items-center justify-center">
         
         {/* 1. VISTA FRENTE (PROPORCIÓN STREETWEAR NATURAL) */}
         {currentView === 'frente' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_20px_35px_rgba(0,0,0,0.6)]"
+            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
           >
             {/* Cuerpo Camiseta */}
             <path
@@ -112,7 +118,7 @@ export default function Tshirt2DEditor({
         {currentView === 'espalda' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_20px_35px_rgba(0,0,0,0.6)]"
+            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
           >
             {/* Cuerpo Camiseta */}
             <path
@@ -141,7 +147,7 @@ export default function Tshirt2DEditor({
         {currentView === 'manga-izquierda' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_20px_35px_rgba(0,0,0,0.6)]"
+            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
           >
             <path
               d="M110,65 L240,65 C260,85 310,140 310,240 L205,270 L185,200 L185,365 L110,365 Z"
@@ -175,7 +181,7 @@ export default function Tshirt2DEditor({
         {currentView === 'manga-derecha' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_20px_35px_rgba(0,0,0,0.6)]"
+            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
             style={{ transform: 'scaleX(-1)' }}
           >
             <path
@@ -218,7 +224,7 @@ export default function Tshirt2DEditor({
               : 'top-[25%] left-[28%] w-[44%] h-[50%] border-blue-500/40 bg-blue-500/5'
           }`}
         >
-          <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] font-mono text-blue-400 font-bold whitespace-nowrap">
+          <span className="absolute -bottom-4 sm:-bottom-5 left-1/2 -translate-x-1/2 text-[8px] sm:text-[9px] font-mono text-blue-400 font-bold whitespace-nowrap">
             Área de Estampado DTF
           </span>
         </div>
@@ -233,11 +239,11 @@ export default function Tshirt2DEditor({
             let baseOffsetX = 0;
             let baseOffsetY = 0;
             if (currentView === 'manga-izquierda') {
-              baseOffsetX = 40;
-              baseOffsetY = -24;
+              baseOffsetX = 35;
+              baseOffsetY = -20;
             } else if (currentView === 'manga-derecha') {
-              baseOffsetX = -40;
-              baseOffsetY = -24;
+              baseOffsetX = -35;
+              baseOffsetY = -20;
             }
 
             const totalX = (design.x || 0) + baseOffsetX;
@@ -253,7 +259,7 @@ export default function Tshirt2DEditor({
                   cursor: isDraggingRef.current && isSelected ? 'grabbing' : 'grab',
                   touchAction: 'none'
                 }}
-                className={`absolute w-36 h-36 flex items-center justify-center transition-shadow select-none group ${
+                className={`absolute w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center transition-shadow select-none group ${
                   isSelected
                     ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-transparent'
                     : 'hover:ring-1 hover:ring-blue-400/60'
@@ -268,8 +274,8 @@ export default function Tshirt2DEditor({
 
                 {/* Controles flotantes si está seleccionado */}
                 {isSelected && (
-                  <div className="absolute -top-7 right-0 flex items-center gap-1 bg-[#111111] text-white px-2 py-0.5 rounded-md border border-neutral-700 text-[10px] font-mono shadow-lg">
-                    <span className="text-blue-400 font-bold">Zoom: {design.scale}%</span>
+                  <div className="absolute -top-6 sm:-top-7 right-0 flex items-center gap-1 bg-[#111111] text-white px-1.5 sm:px-2 py-0.5 rounded-md border border-neutral-700 text-[9px] sm:text-[10px] font-mono shadow-lg pointer-events-none">
+                    <span className="text-blue-400 font-bold">{design.scale}%</span>
                   </div>
                 )}
               </div>
@@ -280,17 +286,17 @@ export default function Tshirt2DEditor({
       </div>
 
       {/* Indicador de Vista en la Esquina */}
-      <div className="absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-800 text-[11px] font-bold text-white flex items-center gap-1.5 shadow-md">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/90 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-slate-800 text-[10px] sm:text-[11px] font-bold text-white flex items-center gap-1.5 shadow-md">
         <span className="w-2 h-2 rounded-full bg-blue-500" />
         <span className="capitalize font-mono">
-          Vista: {currentView === 'manga-izquierda' ? 'Manga Izquierda' : currentView === 'manga-derecha' ? 'Manga Derecha' : currentView}
+          {currentView === 'manga-izquierda' ? 'Manga Izq' : currentView === 'manga-derecha' ? 'Manga Der' : currentView}
         </span>
       </div>
 
       {/* Aviso de interacción */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-slate-800 text-[10px] text-slate-300 font-medium whitespace-nowrap shadow-md flex items-center gap-1.5">
-        <Move className="w-3 h-3 text-blue-400" />
-        <span>Haz clic en el estampado para moverlo libremente</span>
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-slate-800 text-[9px] sm:text-[10px] text-slate-300 font-medium whitespace-nowrap shadow-md flex items-center gap-1.5">
+        <Move className="w-3 h-3 text-blue-400 shrink-0" />
+        <span>Arrastra con el dedo o ratón</span>
       </div>
 
     </div>
