@@ -1,20 +1,22 @@
-const CACHE_NAME = 'ck-estampados-v1';
+const CACHE_NAME = 'ck-estampados-v2';
 const ASSETS_TO_CACHE = [
   '/',
-  '/index.html',
   '/logo-ck.png',
   '/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
+  // Activar inmediatamente la nueva version sin esperar a que se cierren las pestañas
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
 self.addEventListener('activate', (event) => {
+  // Eliminar inmediatamente caches viejas
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -27,15 +29,30 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Solo interceptar peticiones GET del mismo origen
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
+  // Para documentos HTML principales, ir primero a la red para ver cambios de inmediato
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Para recursos estaticos (JS, CSS, imagenes), servir cache y revalidar
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Retornar caché y actualizar en segundo plano (Stale-While-Revalidate)
         fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
@@ -49,7 +66,6 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         }
 
-        // Cachear recursos estáticos nuevos
         const responseToCache = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache);
