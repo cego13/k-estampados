@@ -447,18 +447,20 @@ export default function Tshirt3DViewer({
     window.open('/visor-3d', '_blank');
   };
 
+  const isBlack = colorHex === '#0a0a0a';
+
   return (
-    <div className={`relative w-full ${isStandalone ? 'max-w-4xl h-[75vh] sm:h-[80vh]' : 'max-w-[500px] aspect-[4/5]'} bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-3xl border border-slate-800 shadow-2xl flex flex-col justify-between select-none overflow-hidden mx-auto`}>
+    <div className={`relative w-full ${isStandalone ? 'max-w-4xl h-[75vh] sm:h-[80vh]' : 'max-w-[500px] aspect-[4/5]'} ${isBlack ? 'bg-gradient-to-b from-[#dde2ea] via-[#e8edf3] to-[#d4dae3] border-slate-400/40' : 'bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-slate-800'} rounded-3xl border shadow-2xl flex flex-col justify-between select-none overflow-hidden mx-auto transition-all duration-300`}>
       
       {/* Barra Superior con Selector de Ángulos & Botones */}
-      <div className="p-2.5 sm:p-3.5 z-10 space-y-2 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+      <div className={`p-2.5 sm:p-3.5 z-10 space-y-2 border-b ${isBlack ? 'border-slate-300/80 bg-[#e8edf3]/90 text-slate-800' : 'border-slate-800/80 bg-slate-950/80 text-slate-100'} backdrop-blur-md transition-colors duration-300`}>
         
         {/* Fila 1: Selector de Ángulos 3D (Distribución completa) */}
-        <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 w-full justify-between">
+        <div className={`flex items-center gap-1 ${isBlack ? 'bg-[#d2d9e3]/90 border-slate-400/40' : 'bg-slate-900/90 border-slate-800'} p-1 rounded-xl border w-full justify-between`}>
           <button
             onClick={() => setCameraPreset('frente')}
             className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
-              currentAngle === 'frente' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              currentAngle === 'frente' ? 'bg-blue-600 text-white shadow-sm' : isBlack ? 'text-slate-700 hover:text-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             Frente
@@ -466,7 +468,7 @@ export default function Tshirt3DViewer({
           <button
             onClick={() => setCameraPreset('espalda')}
             className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
-              currentAngle === 'espalda' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              currentAngle === 'espalda' ? 'bg-blue-600 text-white shadow-sm' : isBlack ? 'text-slate-700 hover:text-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             Espalda
@@ -474,7 +476,7 @@ export default function Tshirt3DViewer({
           <button
             onClick={() => setCameraPreset('manga-izq')}
             className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
-              currentAngle === 'manga-izq' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              currentAngle === 'manga-izq' ? 'bg-blue-600 text-white shadow-sm' : isBlack ? 'text-slate-600 hover:text-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             Manga Izq
@@ -482,7 +484,7 @@ export default function Tshirt3DViewer({
           <button
             onClick={() => setCameraPreset('manga-der')}
             className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
-              currentAngle === 'manga-der' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              currentAngle === 'manga-der' ? 'bg-blue-600 text-white shadow-sm' : isBlack ? 'text-slate-600 hover:text-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             Manga Der
@@ -490,7 +492,7 @@ export default function Tshirt3DViewer({
           <button
             onClick={() => setCameraPreset('360')}
             className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
-              currentAngle === '360' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+              currentAngle === '360' ? 'bg-blue-600 text-white shadow-sm' : isBlack ? 'text-slate-600 hover:text-black' : 'text-slate-400 hover:text-white'
             }`}
           >
             360°
@@ -499,7 +501,7 @@ export default function Tshirt3DViewer({
 
         {/* Fila 2: Acciones 3D (Ver Grande & Descargar 3D) */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-400">
+          <div className={`flex items-center gap-1.5 text-[11px] font-mono ${isBlack ? 'text-slate-600' : 'text-slate-400'}`}>
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
             <span className="capitalize">{currentAngle === '360' ? 'Giro Automático' : `Vista: ${currentAngle}`}</span>
           </div>
@@ -508,10 +510,10 @@ export default function Tshirt3DViewer({
             {!isStandalone && (
               <button
                 onClick={handleOpenNewWindow}
-                className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                className={`px-3 py-1.5 rounded-xl ${isBlack ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'} border text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm`}
                 title="Abrir en una ventana grande independiente"
               >
-                <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+                <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
                 <span>Ver Grande</span>
               </button>
             )}
@@ -548,26 +550,26 @@ export default function Tshirt3DViewer({
         />
 
         {loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-sm z-20 space-y-3 pointer-events-none">
+          <div className={`absolute inset-0 flex flex-col items-center justify-center ${isBlack ? 'bg-white/80' : 'bg-slate-950/80'} backdrop-blur-sm z-20 space-y-3 pointer-events-none`}>
             <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-mono text-slate-300 font-bold">Integrando Estampados en 3D...</span>
+            <span className={`text-xs font-mono ${isBlack ? 'text-slate-800' : 'text-slate-300'} font-bold`}>Integrando Estampados en 3D...</span>
           </div>
         )}
       </div>
 
       {/* Barra Inferior con Guía de Uso y Captura HD */}
-      <div className="p-4 z-10 flex items-center justify-between text-slate-400 text-[11px] font-mono border-t border-slate-800/80 bg-slate-950/60 backdrop-blur-sm">
+      <div className={`p-4 z-10 flex items-center justify-between ${isBlack ? 'text-slate-600 border-slate-300/80 bg-white/75' : 'text-slate-400 border-slate-800/80 bg-slate-950/60'} text-[11px] font-mono border-t backdrop-blur-sm transition-colors duration-300`}>
         <span className="flex items-center gap-1.5">
-          <Rotate3d className="w-3.5 h-3.5 text-blue-400" />
+          <Rotate3d className="w-3.5 h-3.5 text-blue-500" />
           <span>Gira con el ratón o dedo en 360°</span>
         </span>
 
         <button
           onClick={handleDownloadSnapshot}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white transition-all text-[10px] font-bold"
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg ${isBlack ? 'bg-white border-slate-300 hover:border-blue-500 text-slate-800 hover:text-black' : 'bg-slate-900 border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white'} border transition-all text-[10px] font-bold`}
           title="Tomar captura en alta definición de la vista actual"
         >
-          <Camera className="w-3 h-3 text-blue-400" />
+          <Camera className="w-3 h-3 text-blue-500" />
           <span>Capturar Foto</span>
         </button>
       </div>

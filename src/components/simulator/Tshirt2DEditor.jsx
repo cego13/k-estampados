@@ -77,10 +77,20 @@ export default function Tshirt2DEditor({
       ref={containerRef}
       onPointerMove={handlePointerMove}
       onTouchMove={handlePointerMove}
-      className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[480px] aspect-[4/5] mx-auto bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 rounded-2xl sm:rounded-3xl border border-slate-800 shadow-2xl flex items-center justify-center select-none overflow-hidden touch-none"
+      className={`relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[480px] aspect-[4/5] mx-auto ${
+        isBlack
+          ? 'bg-gradient-to-b from-[#dde2ea] via-[#e8edf3] to-[#d4dae3] border-slate-400/40 shadow-xl'
+          : 'bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-slate-800 shadow-2xl'
+      } rounded-2xl sm:rounded-3xl border flex items-center justify-center select-none overflow-hidden touch-none transition-all duration-300`}
     >
       {/* Fondo de Cuadrícula Sutil para Guía Visual */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:1.25rem_1.25rem] sm:bg-[size:1.5rem_1.5rem] opacity-20 pointer-events-none" />
+      <div
+        className={`absolute inset-0 ${
+          isBlack
+            ? 'bg-[linear-gradient(to_right,#94a3b8_1px,transparent_1px),linear-gradient(to_bottom,#94a3b8_1px,transparent_1px)] opacity-25'
+            : 'bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] opacity-20'
+        } bg-[size:1.25rem_1.25rem] sm:bg-[size:1.5rem_1.5rem] pointer-events-none transition-opacity duration-300`}
+      />
 
       {/* SILUETA VECTORIAL DE CAMISETA CON PROPORCIONES REALES */}
       <div className="relative w-[92%] h-[92%] flex items-center justify-center">
@@ -89,7 +99,11 @@ export default function Tshirt2DEditor({
         {currentView === 'frente' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
+            className={`w-full h-full ${
+              isBlack
+                ? 'drop-shadow-[0_15px_25px_rgba(0,0,0,0.22)]'
+                : 'drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]'
+            } transition-all duration-300`}
           >
             {/* Cuerpo Camiseta */}
             <path
@@ -118,7 +132,11 @@ export default function Tshirt2DEditor({
         {currentView === 'espalda' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
+            className={`w-full h-full ${
+              isBlack
+                ? 'drop-shadow-[0_15px_25px_rgba(0,0,0,0.22)]'
+                : 'drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]'
+            } transition-all duration-300`}
           >
             {/* Cuerpo Camiseta */}
             <path
@@ -147,7 +165,11 @@ export default function Tshirt2DEditor({
         {currentView === 'manga-izquierda' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
+            className={`w-full h-full ${
+              isBlack
+                ? 'drop-shadow-[0_15px_25px_rgba(0,0,0,0.22)]'
+                : 'drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]'
+            } transition-all duration-300`}
           >
             <path
               d="M110,65 L240,65 C260,85 310,140 310,240 L205,270 L185,200 L185,365 L110,365 Z"
@@ -181,7 +203,11 @@ export default function Tshirt2DEditor({
         {currentView === 'manga-derecha' && (
           <svg
             viewBox="0 0 400 420"
-            className="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
+            className={`w-full h-full ${
+              isBlack
+                ? 'drop-shadow-[0_15px_25px_rgba(0,0,0,0.22)]'
+                : 'drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]'
+            } transition-all duration-300`}
             style={{ transform: 'scaleX(-1)' }}
           >
             <path
